@@ -1,0 +1,110 @@
+//66070501038 Phanthach Jiamjaruschot
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+// struct for graph
+typedef struct Graph_t
+{
+    int V;
+    bool **adj; // set with Dynamic Memory
+} Graph;
+
+// create graph with 2D array
+Graph *createGraph(int V)
+{
+    Graph *graph = (Graph *)malloc(sizeof(Graph));
+    graph->V = V;
+    graph->adj = (bool **)malloc(V * sizeof(bool *));
+    for (int i = 0; i < V; ++i)
+    {
+        graph->adj[i] = (bool *)calloc(V, sizeof(bool));
+    }
+
+    return graph;
+}
+
+void Graph_BFS(Graph *g, int s, int max_v)
+{
+    // Mark all the vertices as not visited
+    bool *visited = (bool *)calloc(max_v, sizeof(bool));
+
+    // Create a queue for BFS
+    int *queue = (int *)malloc(max_v * sizeof(int));
+
+    int front = 0, rear = 0;
+
+    // Mark the current node as visited and enqueue it
+    visited[s] = true;
+    queue[rear++] = s;
+
+    while (front != rear)
+    {
+        // Dequeue a vertex from queue and print it
+        s = queue[front++];
+        printf("%d ", s);
+
+        // Get all adjacent vertices of the dequeued vertex s.
+        // If an adjacent has not been visited, then mark it visited and enqueue it
+        for (int adjacent = 0; adjacent < g->V; adjacent++)
+        {
+            if (g->adj[s][adjacent] && !visited[adjacent])
+            {
+                visited[adjacent] = true;
+                queue[rear++] = adjacent;
+            }
+        }
+    }
+    printf("\n");
+
+    free(visited);
+    free(queue);
+}
+
+void DFSUtil(Graph *graph, int v, bool *visited) {
+    visited[v] = true;
+    printf("%d ", v);
+    for (int i = 0; i < graph->V; ++i) {
+        if (graph->adj[v][i] && !visited[i]) {
+            DFSUtil(graph, i, visited);
+        }
+    }
+}
+
+void DFS(Graph *graph, int startVertex) {
+    bool *visited = (bool *)calloc(graph->V, sizeof(bool));
+    DFSUtil(graph, startVertex, visited);
+    free(visited);
+}
+
+int main()
+{
+    int vertices, edges, init;
+
+    // input vertices and edges
+    scanf("%d", &vertices);
+    scanf("%d", &edges);
+    int src, des;
+    // create graph
+    Graph *graph = createGraph(vertices);
+
+    // set graph values
+    for (int i = 0; i < edges; i++)
+    {
+        scanf("%d %d", &src, &des);
+        graph->adj[src][des] = true;
+        // printf("%d ,%d |",src[i] , des[i]);
+    }
+    
+    scanf("%d", &init);
+    Graph_BFS(graph, init, vertices);
+    DFS(graph,init);
+    // free graph
+    for (int i = 0; i < vertices; ++i)
+    {
+        free(graph->adj[i]);
+    }
+    free(graph->adj);
+    free(graph);
+    return 0;
+}
